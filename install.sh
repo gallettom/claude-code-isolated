@@ -9,8 +9,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO="mensfeld/claude-on-incus"
-BINARY_NAME="coi"
+REPO="thomas/claude-code-isolated"
+BINARY_NAME="cci"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 VERSION="${VERSION:-latest}"
 
@@ -28,7 +28,7 @@ detect_platform() {
             ;;
         *)
             echo -e "${RED}✗ Unsupported OS: $os${NC}"
-            echo "  claude-on-incus only supports Linux (Incus is Linux-only)"
+            echo "  claude-code-isolated only supports Linux (Incus is Linux-only)"
             exit 1
             ;;
     esac
@@ -56,7 +56,7 @@ check_incus() {
     if ! command -v incus &> /dev/null; then
         echo -e "${YELLOW}⚠ Incus not found${NC}"
         echo ""
-        echo "  claude-on-incus requires Incus to be installed."
+        echo "  claude-code-isolated requires Incus to be installed."
         echo "  Install Incus: https://linuxcontainers.org/incus/docs/main/installing/"
         echo ""
         echo "  Quick install (Ubuntu/Debian):"
@@ -82,7 +82,7 @@ check_group() {
     else
         echo -e "${YELLOW}⚠ User is not in incus-admin group${NC}"
         echo ""
-        echo "  You need to be in the incus-admin group to use claude-on-incus."
+        echo "  You need to be in the incus-admin group to use claude-code-isolated."
         echo "  Run: sudo usermod -aG incus-admin \$USER"
         echo "  Then log out and back in for changes to take effect."
         echo ""
@@ -95,15 +95,15 @@ download_binary() {
     local tmp_dir
     local binary_path
 
-    echo -e "${BLUE}→ Downloading claude-on-incus...${NC}"
+    echo -e "${BLUE}→ Downloading claude-code-isolated...${NC}"
 
     tmp_dir="$(mktemp -d)"
     trap "rm -rf '$tmp_dir'" EXIT
 
     if [ "$VERSION" = "latest" ]; then
-        download_url="https://github.com/${REPO}/releases/latest/download/coi-${OS}-${ARCH}"
+        download_url="https://github.com/${REPO}/releases/latest/download/cci-${OS}-${ARCH}"
     else
-        download_url="https://github.com/${REPO}/releases/download/${VERSION}/coi-${OS}-${ARCH}"
+        download_url="https://github.com/${REPO}/releases/download/${VERSION}/cci-${OS}-${ARCH}"
     fi
 
     binary_path="${tmp_dir}/${BINARY_NAME}"
@@ -125,10 +125,10 @@ download_binary() {
 
     if [ -w "$INSTALL_DIR" ]; then
         cp "$binary_path" "${INSTALL_DIR}/${BINARY_NAME}"
-        ln -sf "${INSTALL_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/claude-on-incus"
+        ln -sf "${INSTALL_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/claude-code-isolated"
     else
         sudo cp "$binary_path" "${INSTALL_DIR}/${BINARY_NAME}"
-        sudo ln -sf "${INSTALL_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/claude-on-incus"
+        sudo ln -sf "${INSTALL_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/claude-code-isolated"
     fi
 
     echo -e "${GREEN}✓ Installed to ${INSTALL_DIR}/${BINARY_NAME}${NC}"
@@ -229,13 +229,13 @@ post_install() {
     echo "Next steps:"
     echo ""
     echo "  1. Build the COI image:"
-    echo "     ${BLUE}coi build${NC}"
+    echo "     ${BLUE}cci build${NC}"
     echo ""
     echo "  2. Start your first session:"
-    echo "     ${BLUE}coi shell${NC}"
+    echo "     ${BLUE}cci shell${NC}"
     echo ""
     echo "  3. View available commands:"
-    echo "     ${BLUE}coi --help${NC}"
+    echo "     ${BLUE}cci --help${NC}"
     echo ""
 
     if ! groups | grep -q incus-admin; then
@@ -253,7 +253,7 @@ post_install() {
 main() {
     echo ""
     echo -e "${BLUE}════════════════════════════════════════${NC}"
-    echo -e "${BLUE}  claude-on-incus (coi) installer${NC}"
+    echo -e "${BLUE}  claude-code-isolated (cci) installer${NC}"
     echo -e "${BLUE}════════════════════════════════════════${NC}"
     echo ""
 

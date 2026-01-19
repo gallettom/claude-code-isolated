@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build script for coi image
+# Build script for cci image
 # This script runs INSIDE the container during image build
 #
 # It installs all dependencies needed for CLI tool execution:
@@ -17,7 +17,7 @@ CODE_USER="code"
 CODE_UID=1000
 
 log() {
-    echo "[coi] $*"
+    echo "[cci] $*"
 }
 
 #######################################
@@ -44,7 +44,7 @@ configure_dns_if_needed() {
     rm -f /etc/resolv.conf
     cat > /etc/resolv.conf << 'EOF'
 # Static DNS configuration (auto-configured due to DNS misconfiguration)
-# See: https://github.com/mensfeld/claude-on-incus#troubleshooting
+# See: https://github.com/thomas/claude-code-isolated#troubleshooting
 nameserver 8.8.8.8
 nameserver 8.8.4.4
 nameserver 1.1.1.1
@@ -231,7 +231,7 @@ cleanup() {
 # Main
 #######################################
 main() {
-    log "Starting coi image build..."
+    log "Starting cci image build..."
 
     configure_dns_if_needed
     install_base_dependencies
@@ -244,7 +244,7 @@ main() {
     install_github_cli
     cleanup
 
-    log "coi image build complete!"
+    log "cci image build complete!"
 }
 
 main "$@"

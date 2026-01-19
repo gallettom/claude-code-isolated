@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mensfeld/claude-on-incus/internal/config"
-	"github.com/mensfeld/claude-on-incus/internal/container"
-	"github.com/mensfeld/claude-on-incus/internal/session"
+	"github.com/thomas/claude-code-isolated/internal/config"
+	"github.com/thomas/claude-code-isolated/internal/container"
+	"github.com/thomas/claude-code-isolated/internal/session"
 	"github.com/spf13/cobra"
 )
 
@@ -25,10 +25,10 @@ var cleanCmd = &cobra.Command{
 By default, cleans only stopped containers. Use flags to control what gets cleaned.
 
 Examples:
-  coi clean                    # Clean stopped containers
-  coi clean --sessions         # Clean saved session data
-  coi clean --all              # Clean everything
-  coi clean --all --force      # Clean without confirmation
+  cci clean                    # Clean stopped containers
+  cci clean --sessions         # Clean saved session data
+  cci clean --all              # Clean everything
+  cci clean --all --force      # Clean without confirmation
 `,
 	RunE: cleanCommand,
 }
@@ -56,14 +56,14 @@ func cleanCommand(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to get home directory: %w", err)
 	}
-	baseDir := filepath.Join(homeDir, ".coi")
+	baseDir := filepath.Join(homeDir, ".cci")
 	sessionsDir := session.GetSessionsDir(baseDir, toolInstance)
 
 	cleaned := 0
 
 	// Clean stopped containers
 	if cleanAll || (!cleanSessions) {
-		fmt.Println("Checking for stopped claude-on-incus containers...")
+		fmt.Println("Checking for stopped claude-code-isolated containers...")
 
 		containers, err := listActiveContainers()
 		if err != nil {
