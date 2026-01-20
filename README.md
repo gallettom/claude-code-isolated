@@ -93,26 +93,66 @@ Incus is a modern Linux container and virtual machine manager, forked from LXD. 
 
 ## Installation
 
+### Supported Platforms
+
+| Platform | Support | Notes |
+|----------|---------|-------|
+| **Linux** | Native | Direct Incus support |
+| **macOS** | Via Colima | Runs in Linux VM |
+| Windows | Not supported | Use WSL2 with Linux install |
+
 ### Automated Installation (Recommended)
 
 ```bash
-# One-shot install
+# One-shot install (works on Linux and macOS)
 curl -fsSL https://raw.githubusercontent.com/thomas/claude-code-isolated/master/install.sh | bash
-
-# This will:
-# - Download and install cci to /usr/local/bin
-# - Check for Incus installation
-# - Verify you're in incus-admin group
-# - Show next steps
 ```
 
-### Manual Installation
+**On Linux**, this will:
+- Download and install cci to /usr/local/bin
+- Check for Incus installation
+- Verify you're in incus-admin group
+- Set up ZFS storage (optional, for faster container starts)
+
+**On macOS**, this will:
+- Install Colima via Homebrew (if not present)
+- Create a Linux VM with Incus pre-configured
+- Install cci wrapper that executes commands in the VM
+- Install `cci-colima` helper for VM management
+
+### macOS with Colima
+
+On macOS, cci runs inside a Colima Linux VM. The installer handles everything automatically.
+
+**Requirements:**
+- macOS 12+ (Monterey or later)
+- Homebrew installed
+- ~10GB disk space for VM
+
+**Customizing VM resources:**
+```bash
+# Default: 4 CPUs, 8GB RAM, 60GB disk
+COLIMA_CPU=8 COLIMA_MEMORY=16 COLIMA_DISK=100 ./install.sh
+```
+
+**Managing the VM:**
+```bash
+cci-colima status    # Check VM status
+cci-colima start     # Start the VM
+cci-colima stop      # Stop the VM
+cci-colima ssh       # SSH into the VM
+cci-colima incus     # Run incus commands in VM
+```
+
+**Note:** The VM must be running to use cci. Start it with `cci-colima start` after a reboot.
+
+### Linux Manual Installation
 
 For users who prefer to verify each step or cannot use the automated installer:
 
 **Prerequisites:**
 
-1. **Linux OS** - Only Linux is supported (Incus is Linux-only)
+1. **Linux OS** - Native Linux required
    - Supported architectures: x86_64/amd64, aarch64/arm64
 
 2. **Incus installed and initialized**
