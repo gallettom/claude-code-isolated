@@ -235,7 +235,7 @@ setup_colima_vm() {
     # Install Incus in the VM
     echo -e "${BLUE}→ Installing Incus in VM...${NC}"
 
-    colima ssh "${COLIMA_VM_NAME}" -- bash -c '
+    colima -p "${COLIMA_VM_NAME}" ssh -- bash -c '
         set -e
 
         # Update and install dependencies
@@ -288,13 +288,13 @@ setup_incus_socket_forward() {
 
     # Get VM IP
     local vm_ip
-    vm_ip=$(colima ssh "${COLIMA_VM_NAME}" -- hostname -I | awk '{print $1}')
+    vm_ip=$(colima -p "${COLIMA_VM_NAME}" ssh -- hostname -I | awk '{print $1}')
 
     # Create wrapper script for cci to use
     cat > "$socket_dir/incus-proxy.sh" << EOF
 #!/bin/bash
 # Forward Incus commands to Colima VM
-colima ssh ${COLIMA_VM_NAME} -- incus "\$@"
+colima -p ${COLIMA_VM_NAME} ssh -- incus "\$@"
 EOF
     chmod +x "$socket_dir/incus-proxy.sh"
 
@@ -307,7 +307,7 @@ export CCI_COLIMA_VM="${COLIMA_VM_NAME}"
 export CCI_INCUS_REMOTE="colima"
 
 # Alias incus to use Colima VM
-alias incus='colima ssh ${COLIMA_VM_NAME} -- incus'
+alias incus='colima -p ${COLIMA_VM_NAME} ssh -- incus'
 
 echo "CCI environment configured for Colima VM: ${COLIMA_VM_NAME}"
 EOF
@@ -357,21 +357,21 @@ case "${1:-}" in
         colima start "$COLIMA_VM_NAME"
         ;;
     stop)
-        colima stop "$COLIMA_VM_NAME"
+        colima -p "$COLIMA_VM_NAME" stop
         ;;
     restart)
-        colima restart "$COLIMA_VM_NAME"
+        colima -p "$COLIMA_VM_NAME" restart
         ;;
     status)
-        colima status "$COLIMA_VM_NAME"
+        colima -p "$COLIMA_VM_NAME" status
         ;;
     ssh)
         shift
-        colima ssh "$COLIMA_VM_NAME" -- "${@:-bash}"
+        colima -p "$COLIMA_VM_NAME" ssh -- "${@:-bash}"
         ;;
     incus)
         shift
-        colima ssh "$COLIMA_VM_NAME" -- incus "$@"
+        colima -p "$COLIMA_VM_NAME" ssh -- incus "$@"
         ;;
     setup)
         echo "Re-running setup..."
@@ -462,14 +462,14 @@ install_binary_macos() {
 
     # Copy binary to VM
     echo -e "${BLUE}→ Copying binary to Colima VM...${NC}"
-    colima ssh "${COLIMA_VM_NAME}" -- mkdir -p /home/$USER/.local/bin
+    colima -p "${COLIMA_VM_NAME}" ssh -- mkdir -p /home/$USER/.local/bin
 
     # Use cat to transfer the binary
-    cat "$binary_path" | colima ssh "${COLIMA_VM_NAME}" -- "cat > /home/\$USER/.local/bin/cci && chmod +x /home/\$USER/.local/bin/cci"
+    cat "$binary_path" | colima -p "${COLIMA_VM_NAME}" ssh -- "cat > /home/\$USER/.local/bin/cci && chmod +x /home/\$USER/.local/bin/cci"
 
     # Create symlink in VM
-    colima ssh "${COLIMA_VM_NAME}" -- "sudo ln -sf /home/\$USER/.local/bin/cci /usr/local/bin/cci"
-    colima ssh "${COLIMA_VM_NAME}" -- "sudo ln -sf /home/\$USER/.local/bin/cci /usr/local/bin/claude-code-isolated"
+    colima -p "${COLIMA_VM_NAME}" ssh -- "sudo ln -sf /home/\$USER/.local/bin/cci /usr/local/bin/cci"
+    colima -p "${COLIMA_VM_NAME}" ssh -- "sudo ln -sf /home/\$USER/.local/bin/cci /usr/local/bin/claude-code-isolated"
 
     # Create wrapper script on macOS host
     echo -e "${BLUE}→ Creating macOS wrapper script...${NC}"
@@ -497,7 +497,7 @@ else
 fi
 
 # Execute cci in VM with proper working directory
-exec colima ssh "$COLIMA_VM_NAME" -- "cd \"$VM_CWD\" 2>/dev/null || cd ~; cci $*"
+exec colima -p "$COLIMA_VM_NAME" ssh -- "cd \"$VM_CWD\" 2>/dev/null || cd ~; cci $*"
 '
 
     if [ -w "$INSTALL_DIR" ]; then
